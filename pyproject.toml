@@ -1,0 +1,11 @@
+[project]
+name = "steelseries_chatmix_fix"
+version = "0.1.0"
+description = "Fixes the wheel because Steelseries GG is a garbage software somehow..."
+readme = "README.md"
+requires-python = ">=3.13.4"
+
+dependencies = [
+    "hidapi>=0.15.0",
+    "pycaw>=20240210",
+]
