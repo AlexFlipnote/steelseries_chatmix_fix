@@ -12,10 +12,13 @@ Install by using one of the following commands:
 - `uv sync`
 
 > [!NOTE]
-> Depending on your Windows environment, you might also need the `hidapi` DLL installed on your system for the HID module to work).
+> Depending on your Windows environment, you might also need the `hidapi` DLL installed on your system for the HID module to work.
 
 ## Usage
 1. Make sure SteelSeries Sonar is running (we still need those virtual devices active).
 2. Run the script with one of the following methods:
   - `python index.py` (usually debug)
   - `start.bat` (production)
+
+## Supported devices/systems
+I have mostly a **Arctis Nova Pro Wireless** running on Windows 11 Home, if it works somewhere else, good. I have this primarily working on my own machine, but pushed code for fun so I don't lose it.
