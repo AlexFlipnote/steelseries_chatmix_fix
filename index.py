@@ -13,7 +13,7 @@ CHATMIX_EVENT_ID = 69
 
 # Logs
 _log = logging.getLogger(__name__)
-logging.basicConfig(encoding="utf8", level=logging.INFO)
+logging.basicConfig(format="%(levelname)s: %(message)s", encoding="utf8", level=logging.INFO)
 
 
 def get_sonar_volume_controls() -> tuple[Any, Any]:
