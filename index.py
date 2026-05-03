@@ -10,10 +10,24 @@ from typing import Any
 STEELSERIES_VID = 0x1038
 CHATMIX_REPORT_ID = 7
 CHATMIX_EVENT_ID = 69
+NOVA_7_WIRELESS_CHATMIX_LENGTH = 3
 
 # Logs
 _log = logging.getLogger(__name__)
 logging.basicConfig(format="%(levelname)s: %(message)s", encoding="utf8", level=logging.INFO)
+
+
+def parse_chatmix_event(data: list[int]) -> tuple[float, float] | None:
+    """Parse ChatMix reports from Arctis Nova Pro Wireless and Nova 7 Wireless headsets."""
+    if len(data) >= 4 and data[0] == CHATMIX_REPORT_ID and data[1] == CHATMIX_EVENT_ID:
+        return data[2] / 100.0, data[3] / 100.0
+
+    # Arctis Nova 7 Wireless reports ChatMix as [69, game, chat], while
+    # Arctis Nova Pro Wireless reports [7, 69, game, chat].
+    if len(data) >= NOVA_7_WIRELESS_CHATMIX_LENGTH and data[0] == CHATMIX_EVENT_ID:
+        return data[1] / 100.0, data[2] / 100.0
+
+    return None
 
 
 def get_sonar_volume_controls() -> tuple[Any, Any]:
@@ -44,7 +58,7 @@ def find_chatmix_path() -> bytes | None:
             deadline = time.time() + 0.1
             while time.time() < deadline:
                 data = device.read(64)
-                if data and data[0] == CHATMIX_REPORT_ID and data[1] == CHATMIX_EVENT_ID:
+                if data and parse_chatmix_event(data):
                     return path
         except Exception:
             pass
@@ -87,12 +101,12 @@ def read_chatmix() -> None:
 
         while True:
             data = device.read(64)
-            if data and data[0] == CHATMIX_REPORT_ID and data[1] == CHATMIX_EVENT_ID:
-                game = data[2] / 100.0
-                chat = data[3] / 100.0
+            parsed = parse_chatmix_event(data)
+            if parsed:
+                game, chat = parsed
                 gaming_vol.SetMasterVolumeLevelScalar(game, None)
                 chat_vol.SetMasterVolumeLevelScalar(chat, None)
-                _log.info(f"Game: {data[2]:3}%  Chat: {data[3]:3}%")
+                _log.info(f"Game: {round(game * 100):3}%  Chat: {round(chat * 100):3}%")
             time.sleep(0.05)
 
     except OSError as e:
